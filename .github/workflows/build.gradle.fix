@@ -1,0 +1,43 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://plugins.gradle.org/m2/' }
+    }
+    dependencies {
+        classpath('com.anatawa12.forge:ForgeGradle:2.3-1.0.+') { changing = true }
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.1.0"
+group = "com.example.coloredsword"
+archivesBaseName = "coloredsword"
+
+sourceCompatibility = targetCompatibility = "1.8"
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
+
+minecraft {
+    version = "1.12.2-14.23.5.2860"
+    runDir = "run"
+    mappings = "snapshot_20171003"
+}
+
+dependencies {
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
