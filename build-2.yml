@@ -1,0 +1,38 @@
+name: Build Mod
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 4.10.2
+
+      - name: Extrair o mod
+        run: |
+          ZIPFILE=$(ls *.zip | head -n 1)
+          unzip -o "$ZIPFILE" -d extracted
+          echo "MOD_DIR=$(find extracted -maxdepth 3 -name build.gradle -exec dirname {} \;)" >> $GITHUB_ENV
+
+      - name: Corrigir build.gradle
+        run: cp build.gradle.fix "$MOD_DIR/build.gradle"
+
+      - name: Compilar o mod
+        run: cd "$MOD_DIR" && gradle build --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coloredsword-mod-jar
+          path: ${{ env.MOD_DIR }}/build/libs/*.jar
